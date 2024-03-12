@@ -14,6 +14,11 @@ class Request
         $this->uriPattern = $uriPattern;
     }
 
+    public function getUriPattern(): string
+    {
+        return $this->uriPattern;
+    }
+
     public function getParams()
     {
         $uri = explode('?', $this->getPath())[0];
