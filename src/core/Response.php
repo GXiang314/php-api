@@ -3,9 +3,15 @@ namespace demo\core;
 
 class Response
 {
-    public function setCookie($name, $value, $expire = 0)
+    public function setCookie($name, $value, $expire = 0, $sameSite = 'None', $secure = false, $httpOnly = true)
     {
-        setcookie($name, $value, $expire);
+        setcookie($name, $value, [
+            'expires' => $expire,
+            'path' => '/',
+            'secure' => $secure,
+            'httponly' => $httpOnly,
+            'samesite' => $sameSite,
+        ]);
     }
 
     public function json($data = null, $msg = "ok.", $code = 200)

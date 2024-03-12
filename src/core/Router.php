@@ -91,8 +91,9 @@ class Router
             $this->request->getParams();
             $this->request->getQuery();
             $this->request->getBody();
-            $callback = $this->getRequestCallback($this->request);
+            $this->request->getHeaders();
             try {
+                $callback = $this->getRequestCallback($this->request);
                 if ($callback) {
                     return call_user_func($callback, $this->request, $this->response);
                 }
