@@ -1,0 +1,22 @@
+{
+    "name": "gxiang/demo",
+    "version": "0.0.1",
+    "autoload": {
+        "psr-4": {
+            "demo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "GXiang",
+            "email": "xxx@demo.com"
+        }
+    ],
+    "require": {},
+    "scripts": {
+        "start": "php -S localhost:8000 -t src\\public"
+    },
+    "config": {
+        "process-timeout": 0
+    }
+}
