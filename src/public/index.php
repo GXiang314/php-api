@@ -9,6 +9,7 @@ require "../../vendor/autoload.php";
 $app = new Application();
 
 $app->router->get('/api/demo', [demoController::class, 'index']);
+$app->router->post('/api/demo', [demoController::class, 'create']);
 
 $app->run();
 

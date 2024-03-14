@@ -21,7 +21,7 @@ class Request
 
     public function getParams()
     {
-        $uri = explode('?', $this->getPath())[0];
+        $uri = $this->getPath();
         $baseRegex = "/\{([^\/]+)\}/";
         $replacedRouteTemplate = '#^' . preg_replace($baseRegex, '(?<$1>[^\/]+)', $this->uriPattern) . '$#';
         preg_match($replacedRouteTemplate, $uri, $matches);
@@ -52,7 +52,7 @@ class Request
 
     public function getPath()
     {
-        $path = $_SERVER['REQUEST_URI'] ?? '/';
+        $path = explode('?', $_SERVER['REQUEST_URI'] ?? '/')[0];
         return $path;
     }
 

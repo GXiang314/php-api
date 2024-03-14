@@ -18,4 +18,9 @@ class DemoController
     {
         return $response->json($this->demoService->getData());
     }
+
+    public function create(Request $request, Response $response)
+    {
+        return $response->json($request->getBody());
+    }
 }
