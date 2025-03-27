@@ -1,5 +1,5 @@
 <?php
-namespace demo\repositories;
+namespace demo\modules\demo;
 
 class DemoRepository {
     public function getData() {

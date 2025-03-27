@@ -2,7 +2,7 @@
 namespace demo\public;
 
 use demo\core\Application;
-use demo\controllers\demoController;
+use demo\modules\demo\demoController;
 
 require "../../vendor/autoload.php";
 

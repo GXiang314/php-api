@@ -1,10 +1,9 @@
 <?php
 
-namespace demo\controllers;
+namespace demo\modules\demo;
 
 use demo\core\Request;
 use demo\core\Response;
-use demo\services\DemoService;
 
 class DemoController
 {

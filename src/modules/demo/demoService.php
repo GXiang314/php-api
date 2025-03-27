@@ -1,6 +1,5 @@
 <?php
-namespace demo\services;
-use demo\repositories\DemoRepository;
+namespace demo\modules\demo;
 
 class DemoService {
     private $demoRepository;
