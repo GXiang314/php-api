@@ -12,9 +12,12 @@
             "email": "xxx@demo.com"
         }
     ],
-    "require": {},
+    "require": {
+        "firebase/php-jwt": "^6.11",
+        "vlucas/phpdotenv": "^5.6"
+    },
     "scripts": {
-        "start": "php -S localhost:8000 -t src\\public"
+        "start": "php -S localhost:8000 -t src\\"
     },
     "config": {
         "process-timeout": 0

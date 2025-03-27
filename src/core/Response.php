@@ -3,6 +3,9 @@ namespace demo\core;
 
 class Response
 {
+    private $code = 200;
+    private $message = "";
+
     public function setCookie($name, $value, $expire = 0, $sameSite = 'None', $secure = false, $httpOnly = true)
     {
         setcookie($name, $value, [
@@ -14,8 +17,25 @@ class Response
         ]);
     }
 
-    public function json($data = null, $msg = "ok.", $code = 200)
+    public function setCode($code)
     {
+        $this->code = $code;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+    public function json($data = null, $msg = null, $code = null)
+    {
+        if ($code === null) {
+            $code = $this->code;
+        }
+        if ($msg === null) {
+            $msg = $this->message;
+        }
+
         header('Content-Type: application/json');
         http_response_code($code);
         $timeBetween = microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"];
@@ -28,8 +48,12 @@ class Response
         exit;
     }
 
-    public function file($base64, $fileName, $code = 200)
+    public function file($base64, $fileName, $code = null)
     {
+        if ($code === null) {
+            $code = $this->code;
+        }
+
         $decoded = base64_decode($base64);
         file_put_contents($fileName, $decoded);
 

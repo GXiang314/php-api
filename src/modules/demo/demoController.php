@@ -4,7 +4,9 @@ namespace demo\modules\demo;
 
 use demo\core\Request;
 use demo\core\Response;
+use demo\decorators\SkipAuth;
 
+#[SkipAuth()]
 class DemoController
 {
     private $demoService;
@@ -15,11 +17,16 @@ class DemoController
 
     public function index(Request $request, Response $response)
     {
-        return $response->json($this->demoService->getData());
+        return $this->demoService->getUsers();
     }
 
     public function create(Request $request, Response $response)
     {
-        return $response->json($request->getBody());
+        if (empty($request->body["username"])) {
+            throw new \Exception("Username cannot be empty", 400);
+        }
+        return [
+            "username" => $request->body["username"]
+        ];
     }
 }

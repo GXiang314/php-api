@@ -2,7 +2,7 @@
 namespace demo\modules\demo;
 
 class DemoRepository {
-    public function getData() {
+    public function findAll() {
         return [
             [
                 "id" => 1,

@@ -1,41 +1,50 @@
 # PHP simplest API Template
 
-##### quick start:
+## quick start
+
+copy .env.example to .env
+
+```shell
+cp .env.example .env
+```
+
+install packages
 
 ```shell
 composer install
-composer start # run php server http://localhost:8000
+composer start # running php server on http://localhost:8000
 ```
 
-##### api response demo:
-http://localhost:8000/api/demo
+## api response demo
+
+<http://localhost:8000/api/demo>
+
 ```json
 {
-    "code": 200,
-    "data": [
-        {
-            "id": 1,
-            "name": "John"
-        },
-        {
-            "id": 2,
-            "name": "Allen"
-        }
-    ],
-    "message": "ok.",
-    "execution_time": 0.0009458065032958984
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "John"
+    },
+    {
+      "id": 2,
+      "name": "Allen"
+    }
+  ],
+  "message": "",
+  "execution_time": "10.347ms"
 }
 ```
 
-##### route register:
-
+## route register
 
 ```php
-# ./src/public/index.php
+# ./src/index.php
 # callback function
-$app->router->get('path/{var}', function() {
-    return json_encode(['data' => '1234'])
-})
+$app->router->get('/path/{id}', function (Request $req, Response $res) {
+    return ['id' => $req->params['id']];
+});
 
 # class method
 $app->router->post('path', [DemoController::class, 'methodName'])

@@ -1,12 +1,16 @@
 <?php
 namespace demo\core;
 
+use demo\core\guard\CanActivate;
+use demo\core\http\ExecutionContext;
+
 class Router
 {
     private array $routes = [];
     private Request $request;
     private Response $response;
     private Container $container;
+    private array $guards = [];
 
     public function __construct($request, $response, $container)
     {
@@ -38,6 +42,11 @@ class Router
     public function delete($path, $callback = null)
     {
         $this->routes['DELETE'][$path] = $callback;
+    }
+
+    public function registerGuard($guardInstance)
+    {
+        $this->guards[] = $guardInstance;
     }
 
     private function getAllPatternFromRoutes()
@@ -85,23 +94,78 @@ class Router
         return false;
     }
 
+    private function executeAllGuards(ExecutionContext $context)
+    {
+        if (count($this->guards) === 0) {
+            return;
+        }
+        foreach ($this->guards as $key => $value) {
+            $guard = $this->container->getInstance($value);
+            if ($guard instanceof CanActivate) {
+                if (!$guard->canActivate($context)) {
+                    return $this->response->json(msg: 'Unauthorized', code: 401);
+                }
+            }
+        }
+    }
+
     public function resolve()
     {
         if ($this->matchUri()) {
-            $this->request->getParams();
-            $this->request->getQuery();
-            $this->request->getBody();
-            $this->request->getHeaders();
+            $this->request->setParams();
+            $this->request->setQuery();
+            $this->request->setBody();
+            $this->request->setHeaders();
             try {
                 $callback = $this->getRequestCallback($this->request);
-                if ($callback) {
-                    return call_user_func($callback, $this->request, $this->response);
+                if (is_array($callback)) {
+                    $ctx = new ExecutionContextImpl($this->request, $this->response, $callback[0]::class, $callback[1]);
+                    $this->executeAllGuards($ctx);
                 }
+                return $this->response->json(call_user_func($callback, $this->request, $this->response));
             } catch (\Exception $e) {
-                return $this->response->json(msg: $e->getMessage(), code: $e->getCode());
+                $code = $e->getCode() == 0 ? 500 : $e->getCode();
+                $msg = empty($e->getMessage()) ? "Internal Server Error" : $e->getMessage();
+                return $this->response->json(msg: $msg, code: $code);
             }
         }
 
         return $this->response->json(msg: 'not found', code: 404);
+    }
+}
+
+class ExecutionContextImpl implements ExecutionContext
+{
+    private Request $request;
+    private Response $response;
+    private string $class;
+    private string $handler;
+
+    public function __construct($request, $response, $class, $handler)
+    {
+        $this->request = $request;
+        $this->response = $response;
+        $this->class = $class;
+        $this->handler = $handler;
+    }
+
+    public function getRequest(): Request
+    {
+        return $this->request;
+    }
+
+    public function getResponse(): Response
+    {
+        return $this->response;
+    }
+
+    public function getClass(): string
+    {
+        return $this->class;
+    }
+
+    public function getHandler(): string
+    {
+        return $this->handler;
     }
 }

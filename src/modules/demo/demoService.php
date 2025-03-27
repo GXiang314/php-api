@@ -8,7 +8,7 @@ class DemoService {
         $this->demoRepository = $demoRepository;
     }
 
-    public function getData() {
-        return $this->demoRepository->getData();
+    public function getUsers() {
+        return $this->demoRepository->findAll();
     }
 }

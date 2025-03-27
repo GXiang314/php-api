@@ -3,11 +3,22 @@ namespace demo\core;
 
 class Request
 {
+    private mixed $user = null;
+    private string $uriPattern = '';
     public array $query = [];
     public array $body = [];
     public array $params = [];
-    private string $uriPattern = '';
     public array $headers = [];
+
+    public function setUserData(mixed $user): void
+    {
+        $this->user = $user;
+    }
+
+    public function user(): mixed
+    {
+        return $this->user;
+    }
 
     public function setUriPattern(string $uriPattern): void
     {
@@ -19,7 +30,7 @@ class Request
         return $this->uriPattern;
     }
 
-    public function getParams()
+    public function setParams()
     {
         $uri = $this->getPath();
         $baseRegex = "/\{([^\/]+)\}/";
@@ -34,38 +45,33 @@ class Request
         return $this->params;
     }
 
-    public function getQuery()
+    public function setQuery()
     {
         $this->query = $_GET;
-        return $this->query;
     }
 
-    public function getBody()
+    public function setBody()
     {
         $this->body = $_POST;
         $body = json_decode(file_get_contents('php://input')) ?? [];
         foreach ($body as $key => $value) {
             $this->body[$key] = $value;
         }
-        return $this->body;
     }
 
     public function getPath()
     {
-        $path = explode('?', $_SERVER['REQUEST_URI'] ?? '/')[0];
-        return $path;
+        return explode('?', $_SERVER['REQUEST_URI'] ?? '/')[0];
     }
 
     public function getMethod()
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        return $method;
+        return $_SERVER['REQUEST_METHOD'];
     }
 
-    public function getHeaders()
+    public function setHeaders()
     {
         $this->headers = getallheaders();
-        return $this->headers;
     }
 
     public function getCookies()
