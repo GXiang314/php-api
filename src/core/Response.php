@@ -23,8 +23,9 @@ class Response
             'code' => $code,
             'data' => $data,
             'message' => $msg,
-            'execution_time' => $timeBetween,
+            'execution_time' => round($timeBetween * 1000, 3) . "ms",
         ]);
+        exit;
     }
 
     public function file($base64, $fileName, $code = 200)
@@ -43,5 +44,6 @@ class Response
             http_response_code($code);
             readfile($fileName);
         }
+        exit;
     }
 }
