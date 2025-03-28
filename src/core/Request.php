@@ -32,14 +32,17 @@ class Request
 
     public function setParams()
     {
-        $uri = $this->getPath();
-        $baseRegex = "/\{([^\/]+)\}/";
-        $replacedRouteTemplate = '#^' . preg_replace($baseRegex, '(?<$1>[^\/]+)', $this->uriPattern) . '$#';
-        preg_match($replacedRouteTemplate, $uri, $matches);
-        preg_match_all('/\{([^\/]+)\}/', $this->uriPattern, $paramNames);
+        $requestPath = $this->getPath();
+        $replacedRouteTemplate = '#^' . preg_replace(
+            Router::VAR_REGEX,
+            Router::VAR_REGEX_REPLACEMENT,
+            $this->uriPattern
+        ) . '$#';
+        preg_match($replacedRouteTemplate, $requestPath, $matches);
+        preg_match_all(Router::VAR_REGEX, $this->uriPattern, $paramNames);
         if (count($paramNames[0]) > 0) {
-            foreach ($paramNames[1] as $name) {
-                $this->params[$name] = $matches[$name];
+            foreach ($paramNames[1] as $key) {
+                $this->params[$key] = $matches[$key];
             }
         }
         return $this->params;

@@ -16,6 +16,8 @@ use stdClass;
 class Router
 {
     private array $routes = [];
+    public const VAR_REGEX = '/\{([^\/]+)\}/';
+    public const VAR_REGEX_REPLACEMENT = '(?<$1>[^\/]+)';
     private Request $request;
     private Response $response;
     private Container $container;
@@ -75,13 +77,16 @@ class Router
 
     private function matchUri()
     {
-        $requestUri = $this->request->getPath();
-        $baseRegex = "/\{([^\/]+)\}/";
+        $requestPath = $this->request->getPath();
         $patterns = $this->getAllPatternFromRoutes();
 
         foreach ($patterns as $pattern) {
-            $replacedRouteTemplate = '#^' . preg_replace($baseRegex, '(?<$1>[^\/]+)', $pattern) . '$#';
-            $pathMatch = preg_match($replacedRouteTemplate, $requestUri, $matches);
+            $replacedRouteTemplate = '#^' . preg_replace(
+                Router::VAR_REGEX,
+                Router::VAR_REGEX_REPLACEMENT,
+                $pattern
+            ) . '$#';
+            $pathMatch = preg_match($replacedRouteTemplate, $requestPath, $matches);
             if ($pathMatch) {
                 $this->request->setUriPattern($pattern);
                 return true;
