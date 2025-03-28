@@ -4,6 +4,7 @@ namespace demo\modules\auth;
 
 use demo\core\Request;
 use demo\core\Response;
+use demo\decorators\Roles;
 use demo\decorators\SkipAuth;
 
 class AuthController
@@ -25,6 +26,7 @@ class AuthController
         return $this->authService->signIn($account, $password);
     }
 
+    #[Roles(["admin", "user"])]
     public function me(Request $request, Response $response)
     {
         return $request->user();
