@@ -100,7 +100,7 @@ class Router
             return;
         }
         foreach ($this->guards as $key => $value) {
-            $guard = $this->container->getInstance($value);
+            $guard = $this->container->getInstance($value::class);
             if ($guard instanceof CanActivate) {
                 if (!$guard->canActivate($context)) {
                     return $this->response->json(msg: 'Unauthorized', code: 401);

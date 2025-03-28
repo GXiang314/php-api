@@ -9,7 +9,7 @@ use demo\modules\auth\AuthController;
 use demo\modules\demo\DemoController;
 use Dotenv\Dotenv;
 
-require "../vendor/autoload.php";
+require __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
 $dotenv->safeLoad();

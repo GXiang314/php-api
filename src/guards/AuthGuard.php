@@ -2,15 +2,18 @@
 
 namespace demo\guards;
 
+use demo\core\Container;
 use demo\core\guard\CanActivate;
 use demo\core\http\ExecutionContext;
 use demo\core\Request;
+use demo\decorators\Singleton;
 use demo\decorators\SkipAuth;
 use demo\modules\auth\JwtConstant;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use stdClass;
 
+#[Singleton()]
 class AuthGuard implements CanActivate
 {
     public function canActivate(ExecutionContext $ctx): bool
@@ -40,9 +43,9 @@ class AuthGuard implements CanActivate
 
     private function checkIsSkipAuth(ExecutionContext $ctx): bool
     {
-        $reflection = new \ReflectionClass($ctx->getClass());
-        $method = $reflection->getMethod($ctx->getHandler());
-        $classAttributes = $reflection->getAttributes(SkipAuth::class);
+        $reflector = Container::getReflection($ctx->getClass());
+        $method = $reflector->getMethod($ctx->getHandler());
+        $classAttributes = $reflector->getAttributes(SkipAuth::class);
         $methodAttributes = $method->getAttributes(SkipAuth::class);
         if (count($methodAttributes) > 0) {
             $skipAuth = $methodAttributes[0]->newInstance();
