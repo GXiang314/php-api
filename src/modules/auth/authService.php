@@ -5,7 +5,8 @@ use Firebase\JWT\JWT;
 
 class AuthService
 {
-    private function signAccessToken($userData) {
+    private function signAccessToken($userData)
+    {
         return JWT::encode([
             ...$userData,
             "iat" => time(),
@@ -16,7 +17,16 @@ class AuthService
     public function signIn($account, $password)
     {
         // Simulate a sign-in process
-        if ($account === 'admin' && $password === 'password') {
+
+        if (
+            $account === 'admin' &&
+            password_verify(
+                password: "password",
+                hash: password_hash(password: $password, algo: PASSWORD_BCRYPT, options: [
+                    "cost" => 10,
+                ])
+            )
+        ) {
             $userData = [
                 'id' => 1,
                 'name' => 'Admin',
