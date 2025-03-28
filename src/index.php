@@ -26,8 +26,6 @@ $app->router->post('/api/signin', [AuthController::class, 'signIn']);
 $app->router->get('/api/me', [AuthController::class, 'me']);
 
 # callback function
-$app->router->get('/path/{id}', function (#[Param('id')] string $id) {
-    return ['id' => $id];
-});
+$app->router->get('/path/{id}', fn(#[Param('id')] string $id) => ['id' => $id]);
 $app->run();
 

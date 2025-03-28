@@ -43,9 +43,8 @@ composer start # running php server on http://localhost:8000
 # ./src/index.php
 # callback function
 use demo\decorators\Param;
-$app->router->get('/path/{id}', function (#[Param('id')] string $id) {
-    return ['id' => $id];
-});
+$app->router->get('/path/{id}', fn(#[Param('id')] string $id) => ['id' => $id]);
+
 
 # class method
 use demo\modules\demo\DemoController;
