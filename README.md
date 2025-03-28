@@ -42,10 +42,12 @@ composer start # running php server on http://localhost:8000
 ```php
 # ./src/index.php
 # callback function
-$app->router->get('/path/{id}', function (Request $req, Response $res) {
-    return ['id' => $req->params['id']];
+use demo\decorators\Param;
+$app->router->get('/path/{id}', function (#[Param('id')] string $id) {
+    return ['id' => $id];
 });
 
 # class method
+use demo\modules\demo\DemoController;
 $app->router->post('path', [DemoController::class, 'methodName'])
 ```

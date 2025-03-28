@@ -3,7 +3,8 @@
 namespace demo\modules\auth;
 
 use demo\core\Request;
-use demo\core\Response;
+use demo\decorators\Body;
+use demo\decorators\Req;
 use demo\decorators\Roles;
 use demo\decorators\SkipAuth;
 
@@ -16,10 +17,10 @@ class AuthController
     }
 
     #[SkipAuth()]
-    public function signIn(Request $request, Response $response)
+    public function signIn(#[Body] SignInInputRequest $body)
     {
-        $account = $request->body["account"];
-        $password = $request->body["password"];
+        $account = $body->account;
+        $password = $body->password;
         if (empty($account) || empty($password)) {
             throw new \Exception("Account and password cannot be empty", 400);
         }
@@ -27,8 +28,14 @@ class AuthController
     }
 
     #[Roles(["admin", "user"])]
-    public function me(Request $request, Response $response)
+    public function me(#[Req] Request $request)
     {
         return $request->user();
     }
+}
+
+class SignInInputRequest
+{
+    public string $account;
+    public string $password;
 }

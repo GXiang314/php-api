@@ -3,6 +3,15 @@ namespace demo\core;
 
 use demo\core\guard\CanActivate;
 use demo\core\http\ExecutionContext;
+use demo\decorators\Body;
+use demo\decorators\Param;
+use demo\decorators\Query;
+use demo\decorators\Req;
+use demo\decorators\Res;
+use ReflectionFunction;
+use ReflectionMethod;
+use ReflectionParameter;
+use stdClass;
 
 class Router
 {
@@ -122,7 +131,11 @@ class Router
                     $ctx = new ExecutionContextImpl($this->request, $this->response, $callback[0]::class, $callback[1]);
                     $this->executeAllGuards($ctx);
                 }
-                return $this->response->json(call_user_func($callback, $this->request, $this->response));
+
+                return $this->response->json(call_user_func_array(
+                    callback: $callback,
+                    args: $this->getCallbackInjectedArgs($callback)
+                ));
             } catch (\Exception $e) {
                 $code = $e->getCode() == 0 ? 500 : $e->getCode();
                 $msg = empty($e->getMessage()) ? "Internal Server Error" : $e->getMessage();
@@ -131,6 +144,91 @@ class Router
         }
 
         return $this->response->json(msg: 'not found', code: 404);
+    }
+
+    private function autoAssignedProperty(array $object, ReflectionParameter $param, $filterKey = null)
+    {
+        // if it's a filter key, use it to get the value from request body
+        if ($filterKey) {
+            $object = $object[$filterKey] ?? null;
+        }
+
+        $paramType = $param->getType();
+        // if a type is defined and it's a class, instantiate it and map request body properties
+        if ($paramType && !$paramType->isBuiltin()) {
+            $className = $paramType->getName();
+            $instance = new $className();
+            if (is_array($object)) {
+                foreach ($object as $key => $val) {
+                    if (property_exists($instance, $key)) {
+                        $instance->$key = $val;
+                    }
+                }
+            }
+            return $instance;
+        }
+        // if it's array, new instance and map request body properties
+        if (is_array($object)) {
+            $instance = new stdClass();
+            foreach ($object as $key => $val) {
+                $instance->$key = $val;
+            }
+            return $instance;
+        }
+        return $object;
+    }
+
+    private function getCallbackInjectedArgs(mixed $callback)
+    {
+        $reflection = is_array($callback)
+            ? new ReflectionMethod($callback[0], $callback[1])
+            : new ReflectionFunction($callback);
+
+        $params = $reflection->getParameters();
+        $injectedArgs = [];
+
+        foreach ($params as $param) {
+            $value = null;
+            foreach ($param->getAttributes() as $attr) {
+                $attrInstance = $attr->newInstance();
+                switch (true) {
+                    case $attrInstance instanceof Req:
+                        $value = $this->request;
+                        break;
+                    case $attrInstance instanceof Res:
+                        $value = $this->response;
+                        break;
+                    case $attrInstance instanceof Param:
+                        $value = $this->autoAssignedProperty(
+                            $this->request->params,
+                            $param,
+                            $attrInstance->getFilterAttr()
+                        );
+                        break;
+                    case $attrInstance instanceof Query:
+                        $value = $this->autoAssignedProperty(
+                            $this->request->query,
+                            $param,
+                            $attrInstance->getFilterAttr()
+                        );
+                        break;
+                    case $attrInstance instanceof Body:
+                        $value = $this->autoAssignedProperty(
+                            $this->request->body,
+                            $param,
+                            $attrInstance->getFilterAttr()
+                        );
+                        break;
+                    default:
+                        break;
+                }
+                if ($value !== null) {
+                    break;
+                }
+            }
+            $injectedArgs[] = $value;
+        }
+        return $injectedArgs;
     }
 }
 

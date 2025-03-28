@@ -2,8 +2,7 @@
 namespace demo;
 
 use demo\core\Application;
-use demo\core\Request;
-use demo\core\Response;
+use demo\decorators\Param;
 use demo\guards\AuthGuard;
 use demo\modules\auth\AuthController;
 use demo\modules\demo\DemoController;
@@ -27,8 +26,8 @@ $app->router->post('/api/signin', [AuthController::class, 'signIn']);
 $app->router->get('/api/me', [AuthController::class, 'me']);
 
 # callback function
-$app->router->get('/path/{id}', function (Request $req, Response $res) {
-    return ['id' => $req->params['id']];
+$app->router->get('/path/{id}', function (#[Param('id')] string $id) {
+    return ['id' => $id];
 });
 $app->run();
 
