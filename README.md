@@ -1,6 +1,12 @@
 # PHP simplest API Template
 
-## quick start
+## Prerequisite
+
+- php version: `8+`
+- composer installed
+
+
+## Quick start
 
 copy .env.example to .env
 
